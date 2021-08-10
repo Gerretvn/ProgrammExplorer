@@ -1,10 +1,14 @@
-options(java.parameters = "- Xmx1024m")
+###programmexplorer is based on corporaexplorer: https://kgjerde.github.io/corporaexplorer/index.html ###
+
+options(java.parameters = "- Xmx1024m") # prevents java errors during pdf extraction
 
 library(corporaexplorer)
 library(pdftools)
 library(tabulizer)
 
 setwd(".../Parteiprogramme")
+
+# Election programmes downloaded 2021-08-09
 
 DieLinke_URL <- "https://www.die-linke.de/fileadmin/download/wahlen2021/Wahlprogramm/DIE_LINKE_Wahlprogramm_zur_Bundestagswahl_2021.pdf"
 download.file(DieLinke_URL, 'DieLinke.pdf', mode="wb")
@@ -32,7 +36,7 @@ GRUENE <- pdf_text(pdf = "GRUENE.pdf")
 CDU <- pdf_text(pdf = "CDU.pdf")
 
 AfD_neu <- c()
-for (i in 1:length(AfD)) AfD_neu[i] <- extract_text("AfD.pdf", pages=i) 
+for (i in 1:length(AfD)) AfD_neu[i] <- extract_text("AfD.pdf", pages=i)  # arrrgh pdfs!! tabulizer:extract_text is very helpful when pdf has several columns
 FDP_neu <- c()
 for (i in 1:length(FDP)) FDP_neu[i] <- extract_text("FDP.pdf", pages=i) 
 SPD_neu <- c()
@@ -49,7 +53,7 @@ Partei <- c(rep("DieLinke", length(DieLinke)),
             rep("FDP", length(FDP)),
             rep("SPD", length(SPD)),
             rep("GRUENE", length(GRUENE)),
-            rep("CDU", length(CDU)))
+            rep("CDU/CSU", length(CDU)))
 
 Text <- c(DieLinke_neu, AfD_neu, FDP_neu, SPD_neu, GRUENE_neu, CDU_neu)
 
@@ -60,6 +64,9 @@ corpus <- prepare_data(
   date_based_corpus = FALSE,
   grouping_variable = "Partei")
 
+# explore(corpus)  # run app locally 
+
+# run on server (see https://kgjerde.github.io/corporaexplorer/articles/deployment.html) -->
 dir.create("my_app")
 saveRDS(corpus, "my_app/saved_corporaexplorerobject.rds", compress = FALSE)
 
